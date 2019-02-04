@@ -21,7 +21,7 @@ const request = requestFactory({
   jar: true
 })
 
-const baseUrl = 'https://openbadges.org'
+const baseUrl = 'https://backpack.openbadges.org'
 
 module.exports = new BaseKonnector(start)
 
@@ -39,7 +39,7 @@ async function start(fields) {
 
   log('info','fetching web page content')
   const $ = await request(`${baseUrl}`)
-  log('info', 'parsing content', $)
+  log('info', 'parsing content', $.text())
 
 }
 
@@ -52,8 +52,8 @@ function authenticate(email, password) {
     // validate function checks if login was a success
     validate: (statusCode, $, fullResponse) => {
       log('debug', 'status CODE', statusCode)
-      log('debug', 'error mESSAGE', $)
-      log('debug', 'full response', fullResponse)
+      log('debug', 'error mESSAGE', $.text())
+      log('debug', 'full response', fullResponse.request.uri.href)
       /* 
        * returned statusCode == 200 for both success and failure
        * need to consider which web file (see browser console ->
@@ -62,8 +62,7 @@ function authenticate(email, password) {
        * https://backpack.openbadges.org/backpack/login  for failure
        * => false
        *
-       * TODO how to print correctly content of $ and fullResponse ?
-       * (if exist ?)
+       *
        *
        */
       // sometimes, we can get a http error message ($) ?
