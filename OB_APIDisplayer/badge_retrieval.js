@@ -13,17 +13,8 @@ Alors que les tests pour l'instant sont fait sur le navigateur en local.
 
 /* Retrieval of badges using Openbadges' API Displayer */
 
-//var express = require("express");
-//var logfmt = require("logfmt");
-//var https = require("https");
-//var bodyParser = require('body-parser');
 var rp = require('request-promise');
 var fs = require('fs');
-
-
-
-//app.use(logfmt.requestLogger());
-//app.use(bodyParser.json());
 
 /*userEmail examples : 
 'selina.boulic@gmail.com' : ID = 420437
@@ -64,44 +55,36 @@ function getGroupsIdsList (options1, options2, baseUri) {
     .then(function (res) {
       var recData = JSON.parse(res);
       console.debug('2nd res ', recData);
-      // same idea, done in separate function to handle each group
       var options_list = [];
       var groupsList = recData.groups;
       for (var i=0; i<groupsList.length; i++) {
         options_list.push({uri: baseUri+earnerId+'/group/'+groupsList[i].groupId, method: 'GET'});
       }
       console.debug('here option_list ', options_list);
-      return getBadges(options_list)
+      // getBadges allows to do a request for each badge group, thanks to recursivity
+      return getBadges(options_list, groupsList)
     })
 
-function getBadges (options_list) {
-  if (options_list[0]) { // si options_list est (encore) non vide
+function getBadges (options_list, groupsList) {
+  // si options_list est (encore) non vide on refait la request avec les options du premier objet de la liste et on retire ce dernier de options_list à la fin de l'opération
+  if (options_list[0]) {
     return rp(options_list[0])
       .then (function (res) {
-        console.debug('in the 3rd step, 1st badges list ', res);
+//        console.debug('in the 3rd step, 1st badges list ', res);
+        console.debug('typeof res ', typeof(res));
+        fs.writeFile('./OB_badges/'+groupsList[0].name, res, () => {console.log('file written !')});
         options_list.shift(); //remove first element
-        getBadges (options_list);
+        groupsList.shift();
+        getBadges (options_list, groupsList);
       })
   } else {
     console.log('c est fini !!!!!!!!!');
   }
 }
         
-//      return options_list et le then etBadgesGroupsList
-//      return getBadgesGroupsList(recData.groups, baseUri+earnerId+'/group/')
-  
+
 }
 
-/*
-async function getBadgesGroupsList(groupsList, baseUri) {
-  var options_list = [];
-  for (var i=0; i<groupsList.length; i++) {
-    options_list.push({uri: baseUri+groupsList[i].groupId, method: 'GET'});
-    return rp(options3)
-  }
-}
-
-*/
 
 getGroupsIdsList(requestOptions1, requestOptions2, 'https://backpack.openbadges.org/displayer/');
 
