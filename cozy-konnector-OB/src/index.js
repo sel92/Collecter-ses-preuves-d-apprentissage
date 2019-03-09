@@ -1,10 +1,9 @@
 
+
 // Declaration of constants from 'cozy-konnector-libs' library. Others?
 const {
   BaseKonnector,
   requestFactory,
-  signin,
-  scrape,
   log
 } = require('cozy-konnector-libs')
 
@@ -39,39 +38,12 @@ async function start(fields) {
 
   log('info','fetching web page content')
   const $ = await request(`${baseUrl}`)
-  log('info', 'parsing content', $.text())
+  log('info', 'parsing content', typeof($))
+  //const badges = await parsePage('./ob_sb.html')
+  
+  log('info', 'saving data into Cozy')
+  // TODO
 
-}
-
-
-function authenticate(email, password) {
-  return signin({
-    url: `https://backpack.openbadges.org/backpack/login`,
-    formSelector: ('section#login', 'form'),
-    formData: { email: email, password: password },
-    // validate function checks if login was a success
-    validate: (statusCode, $, fullResponse) => {
-      log('debug', 'status CODE', statusCode)
-      log('debug', 'error mESSAGE', $.text())
-      log('debug', 'full response', fullResponse.request.uri.href)
-      /* 
-       * returned statusCode == 200 for both success and failure
-       * need to consider which web file (see browser console ->
-       * network) is returned : 
-       * https://backpack.openbadges.org in case of success => true
-       * https://backpack.openbadges.org/backpack/login  for failure
-       * => false
-       *
-       *
-       *
-       */
-      // sometimes, we can get a http error message ($) ?
-      if (statusCode == 200) {
-        // TO MODIFY
-        return true
-			}
-  	}
-  })
 }
 
 
