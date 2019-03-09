@@ -2,20 +2,21 @@
 /*
 TODO récupérer directement le json avec l'API Displayer sans stockage intermédiaire
 TODO pour chaque badge d'un json récupéré, on exécute la conversion en xAPI. Une suite de badge donne un nouveau dossier, qui contient 1 fichier par badge converti en xAPI
+TODO see this http://rusticisoftware.github.io/TinCanJS/ Library for statements / managing LRS and so on
 TODO les displayed languages... Comment les gérer (function xapi_verb () et object desciption) ? Se baser sur les langues utilisées dans l'ob badge et proposer une liste par défaut dans xapi_display (language, description), ou décréter qu'on ne parle qu'en-US ?
-TODO result, context, attachement : comment les gérer ?
 
         On pourrait, à la fin de la conversion, 'vérifier' que tous les champs de l'ob badge ont été mis dans la format xAPI. Si on en repère qui n'ont pas été 'placés', on passe en mode interactif avec l'utilisateur pour lui suggérer où on peut le placer (par exemple la liste [result, context, attachement]), puis l'utilisateur le fait plus ou moins à la main.
         
 TODO intégrer le xAPI statement validator dans le code
+
+TODO si option de vérification de badge, faire la vérification avant de passer et la conversion, et inclure la vérification ?
 
 
 Problèmes:
 - en pratique, la spécification définie pour les openbadges **ne semble pas** respectée à la lettre. Notamment pour les attributs obligatoires ou optionnels. Irrégularité qui peut poser des problèmes quand on converti 'à la chaîne' . Notamment le type pour l'identification du recipient n'est pas systématiquement précisé (adresse email par défaut ? à check TODO)
 
 Choix d'implémentation faits :
-- construction du triplet xapi (cf section correspondante) : actor = recipient, verb = earned, object = badge, authority = issuer, timestamp = lastValidated value.
-- recipient text hachés dans les openbdages: We consider for an ob badge, actor is always of type "Agent" and identified by non hashed email address which we use to retrieve badges with OB's Displayer API. We may also compute sha1 when it is hashed in ob badge
+- actors/recipients are identified by non hashed email address which we use to retrieve badges with OB's Displayer API. We may also compute sha1 when it is hashed in ob badge
 */
 
 
@@ -23,18 +24,7 @@ var fs = require('fs');
 
 var userEmail = 'selina.boulic@gmail.com';
 
-/**********Récupération des json depuis le fichier local **********/
-//var ob_json = JSON.parse(fs.readFileSync('badges_test/user420437_group146314.json', 'utf8'));
-var ob_json = JSON.parse(fs.readFileSync('badges_test/user867_group1041.json', 'utf8'));
-
-/**********Extraction des badges contenus dans l'attribut "badges" du json: ils y sont stockés sous forme d'une liste de json*********/
-//for (var i=0; i<ob_json.badges.length; i++)
-//        console.debug('liste des bagdes : ', ob_json.badges[i]);
-
-
-/********** Ecriture dans les champs selon ce que contient le badge original json
-- on cherche le champ spécifique field du json badge : recipient ou badge ou issuer etc, dans l'input 
-- on écrit en fonction des input trouvées dans target_field de target_json *********/
+/** Ecriture dans les champs selon ce que contient le badge  **/
 function getFields(input /*, target_field*/) {
         console.log('Entering getFields function');
         var propertyArray = Object.getOwnPropertyNames(input);
@@ -46,64 +36,74 @@ function getFields(input /*, target_field*/) {
 }
 
 //getFields(ob_json.badges[0]);
-console.log(ob_json.badges[1].assertion.badge);
 
 /*================= CONSTRUCTING XAPI JSON ====================*/
 
-/*Triplet is <actor><verb><object>  <authority><timestamp>
+/* Possible fields in xAPI: see more details on 
+	-id: badge unique identifier, provided by the LRProvider or by the LRS
+	- actor : actor, objectType "Group" or "Agent"
+	- verb : verb descripting the event + reference to the definition of this verb such as http://id.tincanapi.com/verb/earned
+	- object : objectType may notably be "Agent"/"Group", "Activity", ...
+	- result : further data to measure the completion of the achievement (score, success, completion, response, duration,...)
+	- context : information about context of the achievement (registration, instructor, team, contextActivities, revision, platform, language, statement,...)
+	- timestamp : date when the record was done
+	- store : date when the record was stored in a LRS
+	- authority : the person/entity/organisation/... asserting this statement is true
+	- version : statement version number
+	- attachements : important image/video, essay, certificate, ... to be joined to the statement (usageType, display, description, contentType, length, sha2, fileUrl).
+
+
+
+Here I propose one solution for the conversion, consisting in just considering that 'earning badges' represent an activity in itself. Yet, we may also want to store the activity itself, with the badge as certification. The main problem here is that constructing the record is much more difficult and may require human intervention. For this application, the best solution would certainly be Openbadges issuers proposing an xAPI version for each of their badges.
+
+For my conversion proposal into xAPI, I chose to keep 5 elements:
+Triplet is <actor><verb><object>  <authority><timestamp><stored>
         - actor : badge recipient
         - verb : always set to 'earned'.
         - object : badge definition. objectType is "Activity"
         - authority : badge issuer
         - timestamp : badge's lastValidated value.
+        - stored : timestamp of when the conversion was done and effectively stored in Cozy Cloud.
 */
 
-var my_xapi_OB = new xapi_OB(ob_json.badges[0], userEmail);
-console.debug(JSON.stringify(my_xapi_OB));
+function xapi_conversion (sourceFile, email) {
+	console.log('we re in');
+  var xapi_badges_list = [];
+  var file_json = JSON.parse(fs.readFileSync(sourceFile, 'utf8'));
+  file_json.badges.forEach((badge) => {
+    var my_xapi_badge = new xapi_badge(badge, email);
+    //console.debug('new xapi badge', JSON.stringify(my_xapi_badge));
+    //TODO check each JSON.stringify(my_xapi_badge) with xAPI validator
+    xapi_badges_list.push(JSON.stringify(my_xapi_badge));
+  });
+  console.debug('xapi_badges_list', xapi_badges_list);
+  fs.writeFileSync(sourceFile+'_xapi.json', xapi_badges_list, () => {console.log('badges_list written !')});
+}
 
 
-function xapi_OB(ob_badge, email, result, context, attachements) {
+function xapi_badge(ob_badge, email) {
+
         this.id; //a uuid generated by the LRS if not by the LRProvider
         this.actor = new xapi_actor(email) ;
         this.verb = {"id": 'http://id.tincanapi.com/verb/earned', "display": {"en-US": "earned"}};
-        this.object = new xapi_object(ob_json.badges[0]);
-        this.result;
-        this.context;
+        this.object = new xapi_object(ob_badge);
         this.timestamp = ob_badge.lastValidated;
-        this.stored; // different from timestamp in the case of ob badges ?
-        this.authority = ob_json.badges[0].assertion.badge.issuer ;
-        this.version;
-        this.attachements;
+        this.stored; // handle ?
+        this.authority = ob_badge.assertion.badge.issuer ;
 }
 
 function xapi_actor (actorEmail) {
         this.objectType = "Agent";
         this.name; // possibly found in ob json ?
         this.mbox = actorEmail;
-        //this.mbox_sha1sum : compute sha1 from email if recipient value is hased in ob json;
+        //this.mbox_sha1sum : compute sha1 from email if recipient value is hashed in ob json;
 }
-
 
 function xapi_object (ob_badge) {
         this.objectType = "Activity";
         this.id = ob_badge.assertion.badge.criteria;
         this.definition = new xapi_object_definition(ob_badge) ;
 }
-
-function xapi_result (score, success, completion, response, duration, extensions) {}
-
-function xapi_context (registration, instructor, team, contextActivities, revision, platform, language, statement, extensions) {}
-
-function authority (objectType /*, ...*/) {
-// Info about who or what has asserted this statement is true
-        
-}
-
-function attachements (usageType, display, description, contentType, length, sha2, fileUrl) {}
-
-
-
-/*================= ADDITIONNAL FUNCTION FOR XAPI FORMATTING ===================*/
 
 function xapi_object_definition (ob_badge) {
         this.name = ob_badge.assertion.badge.name;
@@ -112,7 +112,7 @@ function xapi_object_definition (ob_badge) {
         
 }
 
-
+module.exports.xapi_conversion = xapi_conversion;
 
 /*================= VALIDATING JSON ACCORDING TO XAPI SPECIFICATION ===================*/
 
