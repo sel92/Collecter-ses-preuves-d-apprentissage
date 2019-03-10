@@ -1,11 +1,3 @@
-/*
-TODO list pour la partie API Displayer.
-Retravailler le code proposé, modulariser...
-
-TODO list pour les konnecteurs / le stockage Cozy
-- (re)regarder comment ça marche, comment on peut l'intégrer à Cozy.
-
-*/
 
 
 var retr = require('./badge_retrieval');
@@ -21,14 +13,13 @@ var fs = require('fs');
 
 /* ========= VARIABLES DECLARATION ========= */
 const earnerEmail = 'billy.meinke@gmail.com';
-const dataFolder = './OB_badges'
-//var earnerId = retr.earnerId . May?
+const dataFolder = './OB_badges';
 
-var earnerData = JSON.stringify({
+const earnerData = JSON.stringify({
   email: earnerEmail
 });
 
-var rq_options1 = {
+const rq_options1 = {
   uri : 'https://backpack.openbadges.org/displayer/convert/email', 
   method : 'POST',
   body : earnerData,
@@ -42,11 +33,6 @@ var rq_options2 = {
   method : 'GET'
 };
 
-/* ========= BADGE RETRIEVAL INTO FILES ========= */
-
-//writes owner badges in files in ./OB_badges/ 
-//retr.getGroupsBadges(rq_options1, rq_options2);
-
 
 /* ========= FILES FORMAT CONVERSION ========= */
 
@@ -57,23 +43,35 @@ function filesConversion (folder) {
     console.log('done file '+folder+'/'+file);
   })
 }
-/*
-function doAll () {
-  var earnerFolder;
-  return retr.getUserId(rq_options1)
-    .then ((earnerId) => {
-      earnerFolder = dataFolder+'/'+earnerId;
-      if (!fs.existsSync(earnerFolder)) {
-        fs.mkdirSync(earnerFolder);
-      }
-      return retr.getGroupsBadges(earnerId, rq_options2, earnerFolder)
-    })
-    .then (filesConversion(earnerFolder))
+
+/* ========= WHOLE RETRIEVAL / CONVERSION PROCEDURE ========= */
+
+// with start it works well, but not with doAll...
+
+//doAll();
+start ();
+
+async function start () {
+  const earnerId = await retr.getUserId(rq_options1);
+  var earnerFolder = dataFolder+'/'+earnerId;
+  if (!fs.existsSync(earnerFolder)) {
+    fs.mkdirSync(earnerFolder);
+  }
+  await retr.getGroupsBadges(earnerId, earnerFolder)
+  console.log('starting xapi conversion');
+  filesConversion(earnerFolder)
 }
+
+/*With start function, we get everything in the right order
+awaiting some fun stuff
+awaiting some fun stuff
+awaiting some fun stuff
+all data has been retrieved
+starting xapi conversion
+we re in // from conv
+
+What's the problem in doAll() ?
 */
-doAll();
-
-
 
 function doAll () {
   var earnerFolder;
@@ -83,12 +81,24 @@ function doAll () {
       if (!fs.existsSync(earnerFolder)) {
         fs.mkdirSync(earnerFolder);
       }
-      return retr.getGroupsBadges(earnerId, rq_options2, earnerFolder)
+      return retr.getGroupsBadges(earnerId, earnerFolder)
     })
+	  .then (console.log('starting xapi conversion'))
+	  
+/*this is what we obtain with doAll()...
+starting xapi conversion // last .then !
+awaiting some fun stuff // retrieval of group badges in retr
+awaiting some fun stuff
+awaiting some fun stuff
+all data has been retrieved // after all group badges have been retrieved and wirtten in file */
+	  
+    //.then (filesConversion(earnerFolder))
+/*
     .then (() => {
       setTimeout(() => {
         filesConversion(earnerFolder);
       }, 10000) // Comment faire ici?! 
     })
+*/
 }
 
