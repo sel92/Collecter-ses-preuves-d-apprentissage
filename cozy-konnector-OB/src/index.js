@@ -7,19 +7,18 @@ const {
   log,
   mkdirp,
   normalizeFilename, // tool to renormalize filename, notably removing characters that could be an issue : <>:"/\|?*, multiple spaces etc (see doc)
-  addData
+  addData,
+  hydrateAndFilter
 } = require('cozy-konnector-libs')
 
 var rp = require('request-promise');
 
 var retr = require('./badge_retrieval');
 var conv = require('./xapi_conversion');
-//var fs = require('fs'); // no need in Cozy
 
 /* ========= PARAMETERS DECLARATION ========= */
 
 const earnerEmail = 'billy.meinke@gmail.com';
-//const dataFolder = './OB_badges';
 
 const earnerData = JSON.stringify({
   email: earnerEmail
@@ -58,12 +57,13 @@ async function start() {
 //  console.debug('liste des groupes json ', groupsList);
 
   // badges handling
+  // structure Promise.all allows multiple asynchronous calls in parallel
   await Promise.all(groupsList.map(async (group) => {
-    // this structure allows multiple asynchronous calls in parallel
+
     await mkdirp(earnerFolder+'/'+group.name)
     
     const res2 = await rp({uri: 'https://backpack.openbadges.org/displayer/'+earnerId+'/group/'+group.groupId, method: 'GET'})
-  // res2.badges contains the list of JSON stringified badges
+    // res2.badges contains the list of JSON stringified badges
 //    console.debug('liste des badges res 2 ', res2);
     const badgesList = JSON.parse(res2).badges;
 //    console.debug('liste des badges badgesList ', badgesList);
@@ -74,16 +74,20 @@ async function start() {
     }))
     console.debug('list of group badges to save in \'/\'+earnerId+\'/\'+group.name ', groupBadges);
     
-    addData(groupBadges, 'io.cozy.xrecords'+earnerFolder+'/'+group.name)
-    
+    // storage in Cozy. hydrateAndFilter to avoid duplicating files in Cozy
+    hydrateAndFilter(groupBadges, 'io.cozy.xrecords'+earnerFolder+'/'+group.name, {
+      keys: ['object', 'timestamp']
+    }).then(filteredDocuments => addData(filteredDocuments, 'io.cozy.xrecords'+earnerFolder+'/'+group.name))
+        
   }))
-  
-//  log('info', 'saving data into Cozy', 'io.cozy.xrecords'+earnerFolder+'/'+group.name)
+
   /*addData (docs, doctype)
     - docs : array of objects corresponding to the data you want to save in the Cozy
     - doctype (string) : the doctype where you want to save data ()ex 'io.cozy.bills'
   */
 //  return addData(documents, 'io.cozy.xrecords')
+
+
 
 }
 
@@ -105,6 +109,8 @@ TODO :
 
 
 - à tester en mode développement (voir avec Mouhamadou)
+
+- pourquoi le module.exports pour créer le konnecteur ?
 
 */
 
