@@ -1,4 +1,4 @@
-[Cozy][cozy] <OPENBADGES KONNECTOR>
+[Cozy][cozy] OPENBADGES KONNECTOR
 =======================================
 
 What's Cozy?
@@ -41,6 +41,13 @@ Then :
 yarn
 yarn standalone
 ```
+
+ou 
+
+```sh
+npm run standalone
+```
+
 For running the konnector connected to a Cozy server and more details see [konnectors documentation](https://docs.cozy.io/en/dev/konnector/)
 
 ### Cozy-konnector-libs
@@ -49,7 +56,7 @@ This connector uses [cozy-konnector-libs](https://github.com/cozy/cozy-konnector
 
 ### Maintainer
 
-The lead maintainers for this konnector is <sel92>.
+The lead maintainers for this konnector is sel92.
 
 
 ### Get in touch
@@ -66,7 +73,7 @@ You can reach the Cozy Community by:
 License
 -------
 
-<OPENBADGES KONNECTOR> is developed by <sel92> and distributed under the [AGPL v3 license][agpl-3.0].
+OPENBADGES KONNECTOR is developed by sel92 and distributed under the [AGPL v3 license][agpl-3.0].
 
 [cozy]: https://cozy.io "Cozy Cloud"
 [agpl-3.0]: https://www.gnu.org/licenses/agpl-3.0.html
