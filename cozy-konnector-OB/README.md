@@ -11,7 +11,7 @@ What's Cozy?
 What is this konnector about ?
 ------------------------------
 
-This konnector retrieves your badges from your [Openbadges backpack] and stores them in your Cozy after converting them according to [xAPI specification], which would allow to interact with learning record stores (LRS).
+This konnector retrieves your badges from your [Openbadges backpack] and stores them in your Cozy after converting them according to [xAPI specification][xAPI spec], which would allow to interact with learning record stores (LRS).
 It was developped in the scope of a school project combining issues of e-learning and personal data management.
 
 Further links related to LRSs:
@@ -25,7 +25,7 @@ Details about the implementation
 Code is visible in folder src, and made of 3 files:
 - index.js implements the konnector itself, which successively performs badge retrieval (thanks to the email address indicated in file `konnector-dev-config.json`), xAPI conversion and storage in your Cozy. Storage is done so to avoid data duplication.
 - badge_retrieval.js implements some functions used for fetching your badges, using the [Displayer API] of Openbadges.
-- xapi_conversion.js defines the function used for the conversion of badges from Openbadges format to [xAPI format]. As defined in the Openbadges specification, the main components describing a badge are: recipient and badge description including badge issuer. An xAPI statement aims at recording any experience and is writting in the format "actor" "verb" "object", with optional additional elements like "authority". The final format has been chosen as:
+- xapi_conversion.js defines the function used for the conversion of badges from Openbadges format to [xAPI format][xAPI spec]. As defined in the Openbadges specification, the main components describing a badge are: recipient and badge description including badge issuer. An xAPI statement aims at recording any experience and is writting in the format "actor" "verb" "object", with optional additional elements like "authority". The final format has been chosen as:
   + actor = badge recipient
   + verb = "earned"
   + object = badge description
@@ -46,11 +46,19 @@ What should be done before deploying the konnector :
 If you want to work on this konnector and submit code modifications, feel free to open pull-requests!
 </br>See :
 * the [contributing guide][contribute] for more information about how to properly open pull-requests.
-* the [konnectors development guide](https://docs.cozy.io/en/dev/konnector/)
+* the [konnectors development guide](https://docs.cozy.io/en/cozy-konnector-libs/dev/)
 
 ### Run and test
 
-Create a `konnector-dev-config.json` file at the root with your test credentials, ie the email address you use on Openbadges platform :
+1 Clone the git project locally, install node_modules:
+
+```sh
+git clone https://github.com/sel92/Collecter-ses-preuves-d-apprentissage
+cd cozy-konnector-OB
+yarn install # or npm install
+```
+
+2 Create a `konnector-dev-config.json` file at the root with your test credentials, ie the email address you use on Openbadges platform :
 
 ```javascript
 {
@@ -71,7 +79,7 @@ or
 npm run standalone
 ```
 
-For running the konnector connected to a Cozy server and more details see [konnectors documentation](https://docs.cozy.io/en/dev/konnector/)
+For running the konnector connected to a Cozy server and more details see [konnectors documentation](https://docs.cozy.io/en/cozy-konnector-libs/dev/)
 
 ### Cozy-konnector-libs
 
@@ -86,7 +94,7 @@ The lead maintainers for this konnector is sel92.
 
 You can reach the Cozy Community by:
 
-- [konnectors documentation](https://docs.cozy.io/en/dev/konnector/)
+- [konnectors documentation](https://docs.cozy.io/en/cozy-konnector-libs/dev/)
 - Chatting with us on IRC [#cozycloud on Freenode][freenode]
 - Posting on our [Forum]
 - Posting issues on the [Github repos][github]
@@ -111,6 +119,5 @@ OPENBADGES KONNECTOR is developed by sel92 and distributed under the [AGPL v3 li
 [travis]: https://travis-ci.org
 [contribute]: CONTRIBUTING.md
 [Openbadges backpack]: https://backpack.openbadges.org/
-[xAPI specification]: https://xapi.com/
-[xAPI format]: https://xapi.com/
+[xAPI spec]: https://xapi.com/
 [Displayer API]: https://github.com/mozilla/openbadges-backpack/wiki/Using-the-Displayer-API
