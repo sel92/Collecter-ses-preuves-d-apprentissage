@@ -32,7 +32,7 @@
       "verbs": ["GET"]
     },
     "xrecords": {
-      "description": "utilisé pour stocker les traces expériences",
+      "description": "used to store learning records",
       "type": "io.cozy.xrecords",
       "verbs": ["POST", "PUT", "GET", "PATCH", "DELETE"]
     }
