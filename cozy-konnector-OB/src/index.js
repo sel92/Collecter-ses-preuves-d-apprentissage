@@ -46,7 +46,6 @@ Openbadges does not allow us to retrieve specific badges from one group. Thus, w
 - Timestamp is the date when the badge was delivered.
 As we are in 1 specific earner folder, both attributes being equal should ensure comparison goes well.
 
-
 */
 
 
@@ -63,46 +62,24 @@ const {
 } = require('cozy-konnector-libs')
 
 var rp = require('request-promise');
-//var fs = require('fs');
 
 var retr = require('./badge_retrieval');
 var conv = require('./xapi_conversion');
 
 
-
-/* ========= PARAMETERS DECLARATION ========= */
-
-/*userEmail examples : 
-'selina.boulic@gmail.com' : ID = 420437
-'billy.meinke@gmail.com' : ID = 867
-'matt.rogers@digitalme.co.uk' : ID = 139029
-*/
-
-const earnerEmail = 'matt.rogers@digitalme.co.uk';
-
-
-const earnerData = JSON.stringify({
-  email: earnerEmail
-});
-
-
-const rq_options1 = {
-  uri : 'https://backpack.openbadges.org/displayer/convert/email', 
-  method : 'POST',
-  body : earnerData,
-  headers: {'Content-Type': 'application/json',
-	  'Content-Length': Buffer.byteLength(earnerData)
-	}
-};
-
-
 module.exports = new BaseKonnector(start)
+
 
 
    /*============MAIN FUNCTION : START()=================*/
 
-async function start() {
+async function start(fields) {
 
+	// defining constants for badge retrieval and after
+	const earnerEmail = fields.email;
+	const earnerData = JSON.stringify({email: earnerEmail});
+	const rq_options1 = new make_rq_options (earnerData);
+	
   // OB Displayer API Step 1: Getting user id
   log('info', 'getting earner ID from openbadges...')
 	const earnerId = await retr.getUserId(rq_options1);
@@ -166,3 +143,14 @@ async function start() {
 }
 
 
+   /*============ADDITIONAL FUNCTIONS=================*/
+
+// this function allows to create the options object for the POST request promise (OB first step)
+function make_rq_options (body) {
+	this.uri = 'https://backpack.openbadges.org/displayer/convert/email';
+	this.method = 'POST'
+	this.body = body;
+	this.headers = {'Content-Type': 'application/json',
+	  'Content-Length': Buffer.byteLength(body)
+	}
+}

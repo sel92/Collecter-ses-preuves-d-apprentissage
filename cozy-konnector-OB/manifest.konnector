@@ -3,37 +3,39 @@
   "name": "Openbadges Konnector",
   "type": "konnector",
   "language": "node",
-//  "icon": "icon.png",
+  "icon": "icon.png",
   "slug": "projet S5 : collecte de preuves d apprentissage",
-  "source": "https://github.com/sel92/Collecter-ses-preuves-d-apprentissage",
+  "source": "https://github.com/sel92/Collecter-ses-preuves-d-apprentissage/tree/master/cozy-konnector-OB",
   "developer": {
     "name": "Sel92"
   },
   "vendor_link": "https://backpack.openbadges.org/",
   "categories": ["other"],
+  "fields": {
+    "email": {
+      "type": "text"
+    },
+    "advancedFields": {
+      "folderPath": {
+        "advanced": true,
+        "isRequired": false
+      }
+    }
   },
   "data_types": [
-    "lrs",
-    "files"
+    "xrecords"
   ],
-  /* 
-  * permissions = which HTTP verbs can be used for requests to the Cozy Stack
-  * "GET" : retrieve data
-  * "POST" : submit data
-  * "PUT" : replaces all current representations of the target resource with the request payload
-  * "DELETE" : deletes the specified resource
-  * "PATCH" : apply partial modifications to the resource
-  */
+
   "permissions": {
-    "lrs": {
-      "description": "utilisé pour gérer les badges comme un Learning Record Store (LRS)",
-      "type": "io.cozy.lrs",
+    "accounts": {
+      "type": "io.cozy.accounts",
       "verbs": ["GET"]
     },
-    "files": {
-      "description": "Required to save the bills",
-      "type": "io.cozy.files"
-    },
+    "xrecords": {
+      "description": "utilisé pour stocker les traces expériences",
+      "type": "io.cozy.xrecords",
+      "verbs": ["POST", "PUT", "GET", "PATCH", "DELETE"]
+    }
   },
   "developer": {
     "name": "Cozy Cloud",
@@ -43,7 +45,7 @@
   "locales": {
     "fr": {
       "short_description": "Konnecteur Openbadges",
-      "long_description": "Ce konnecteur récupère les badges d'un utilisateur sur la plateforme Openbadges, les convertit sous le format xAPI pour ensuite les stocker dans le Cloud Cozy. On peut faire une requête pour récupérer ces badges xAPI.",
+      "long_description": "Ce konnecteur récupère les badges d'un utilisateur sur la plateforme Openbadges, les convertit sous le format xAPI pour ensuite les stocker dans le Cloud Cozy. On peut faire une requête pour récupérer ces badges xAPI."
     },
     "en": {
       "short_description": "Openbadges konnector",

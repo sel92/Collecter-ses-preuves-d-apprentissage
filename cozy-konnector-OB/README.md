@@ -23,7 +23,7 @@ Details about the implementation
 --------------------------------
 
 Code is visible in folder src, and made of 3 files:
-- index.js implements the konnector itself, which successively performs badge retrieval, xAPI conversion and storage in your Cozy. Storage is done so to avoid data duplication.
+- index.js implements the konnector itself, which successively performs badge retrieval (thanks to the email address indicated in file `konnector-dev-config.json`), xAPI conversion and storage in your Cozy. Storage is done so to avoid data duplication.
 - badge_retrieval.js implements some functions used for fetching your badges, using the [Displayer API] of Openbadges.
 - xapi_conversion.js defines the function used for the conversion of badges from Openbadges format to [xAPI format]. As defined in the Openbadges specification, the main components describing a badge are: recipient and badge description including badge issuer. An xAPI statement aims at recording any experience and is writting in the format "actor" "verb" "object", with optional additional elements like "authority". The final format has been chosen as:
   + actor = badge recipient
@@ -50,12 +50,12 @@ If you want to work on this konnector and submit code modifications, feel free t
 
 ### Run and test
 
-Create a `konnector-dev-config.json` file at the root with your test credentials :
+Create a `konnector-dev-config.json` file at the root with your test credentials, ie the email address you use on Openbadges platform :
 
 ```javascript
 {
   "COZY_URL": "http://cozy.tools:8080",
-  "fields": {}
+  "fields": {"email": "zuck.m@rk.fb"}
 }
 ```
 Then :
