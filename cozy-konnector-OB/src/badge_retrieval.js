@@ -2,9 +2,9 @@
 
 /* Retrieval of badges using Openbadges' API Displayer */
 
-var rp = require('request-promise');
-//var fs = require('fs');
+// This file only contains the 2 first steps for badge retrieval. The last one is done directly in main file './index.js'
 
+var rp = require('request-promise');
 var conv = require('./xapi_conversion');
 
 
@@ -30,16 +30,7 @@ async function getGroupsList (earnerId) {
 }
 
 
-async function getGroupsBadges (earnerId, badgesGroup) {
-/* TODO to fill
- * Step 3 : Handling the content of each group of badges : earnerId+'/'+group.name
- */ 
-  console.log('all data has been retrieved');
-}
-
-
 module.exports.getUserId = getUserId;
 module.exports.getGroupsList = getGroupsList;
-//module.exports.getGroupsBadges = getGroupsBadges;
 
 

@@ -11,11 +11,33 @@ What's Cozy?
 What is this konnector about ?
 ------------------------------
 
-This konnector retrieves your badges from your Openbadges backpack (https://backpack.openbadges.org/). These badges are stored in your Cozy along with a conversion according to xAPI specification (https://xapi.com/), which would allow to interact with learning record stores (LRS).
+This konnector retrieves your badges from your [Openbadges backpack] and store them in your Cozy after converting them according to [xAPI specification], which would allow to interact with learning record stores (LRS).
+It was developped in the scope of a school project combining issues of e-learning and personal data management.
 
-Further links
+Further links related to LRSs:
 - https://xapi.com/building-a-learning-record-store/
 - http://rusticisoftware.github.io/TinCanJS/
+
+
+Details about the implementation
+--------------------------------
+
+Code is visible in folder src, and made of 3 files:
+- index.js implements the konnector itself, which performs badge retrieval, xAPI conversion and storage in your Cozy. Storage is done so to avoid data duplication.
+- badge_retrieval.js implements some functions used for fetching your badges, using the [Displayer API] of Openbadges.
+- xapi_conversion.js defines the function used for the conversion of badges from Openbadges format to [xAPI format]. As defined in the Openbadges specification, the main components describing a badge are: recipient and badge description including badge issuer. An xAPI statement aims at recording any experience and is writting in the format "actor" "verb" "object", with optional additional elements like "authority". The final format has been chosen as:
+  actor = badge recipient
+  verb = "earned"
+  object = badge description
+  + authority = badge issuer
+This choice is detailled in this file. The conversion is still very basic as a lot of elements may be lost during the process ('advanced' fiels like the badge verification option proposed by Openbagdes, user identity protection with id hash, ...)
+
+
+Further remarks for konnector deployement
+-----------------------------------------
+
+What should be done before deploying the konnector :
+- develop the frontend part, so a user may visualize his badges on mycozy.cloud.
 
 
 ### Open a Pull-Request
@@ -42,7 +64,7 @@ yarn
 yarn standalone
 ```
 
-ou 
+or
 
 ```sh
 npm run standalone
@@ -87,3 +109,7 @@ OPENBADGES KONNECTOR is developed by sel92 and distributed under the [AGPL v3 li
 [yarn]: https://yarnpkg.com
 [travis]: https://travis-ci.org
 [contribute]: CONTRIBUTING.md
+[Openbadges backpack]: https://backpack.openbadges.org/
+[xAPI specification]: https://xapi.com/
+[xAPI format]: https://xapi.com/
+[Displayer API]: https://github.com/mozilla/openbadges-backpack/wiki/Using-the-Displayer-API
