@@ -72,7 +72,9 @@ module.exports.xapi_badge = xapi_badge;
 - xslt for automatically getting xAPI format from Openbadges format.
 - handling hashed identity in Openbadges spec vs xAPI
 - handling badge verification in xAPI ?
-- Cozy cloud as LRS ?
+- Cozy cloud as LRS
+    -> https://xapi.com/building-a-learning-record-store/
+    -> http://rusticisoftware.github.io/TinCanJS/
 */
 
 

@@ -14,10 +14,6 @@ What is this konnector about ?
 This konnector retrieves your badges from your [Openbadges backpack] and stores them in your Cozy after converting them according to [xAPI specification][xAPI spec], which would allow to interact with learning record stores (LRS).
 It was developped in the scope of a school project combining issues of e-learning and personal data management.
 
-Further links related to LRSs:
-- https://xapi.com/building-a-learning-record-store/
-- http://rusticisoftware.github.io/TinCanJS/
-
 
 Details about the implementation
 --------------------------------
