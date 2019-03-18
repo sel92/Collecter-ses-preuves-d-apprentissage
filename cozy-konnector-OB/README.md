@@ -11,7 +11,7 @@ What's Cozy?
 What is this konnector about ?
 ------------------------------
 
-This konnector retrieves your badges from your [Openbadges backpack] and store them in your Cozy after converting them according to [xAPI specification], which would allow to interact with learning record stores (LRS).
+This konnector retrieves your badges from your [Openbadges backpack] and stores them in your Cozy after converting them according to [xAPI specification], which would allow to interact with learning record stores (LRS).
 It was developped in the scope of a school project combining issues of e-learning and personal data management.
 
 Further links related to LRSs:
@@ -23,14 +23,15 @@ Details about the implementation
 --------------------------------
 
 Code is visible in folder src, and made of 3 files:
-- index.js implements the konnector itself, which performs badge retrieval, xAPI conversion and storage in your Cozy. Storage is done so to avoid data duplication.
+- index.js implements the konnector itself, which successively performs badge retrieval, xAPI conversion and storage in your Cozy. Storage is done so to avoid data duplication.
 - badge_retrieval.js implements some functions used for fetching your badges, using the [Displayer API] of Openbadges.
 - xapi_conversion.js defines the function used for the conversion of badges from Openbadges format to [xAPI format]. As defined in the Openbadges specification, the main components describing a badge are: recipient and badge description including badge issuer. An xAPI statement aims at recording any experience and is writting in the format "actor" "verb" "object", with optional additional elements like "authority". The final format has been chosen as:
-  actor = badge recipient
-  verb = "earned"
-  object = badge description
+  + actor = badge recipient
+  + verb = "earned"
+  + object = badge description
   + authority = badge issuer
-This choice is detailled in this file. The conversion is still very basic as a lot of elements may be lost during the process ('advanced' fiels like the badge verification option proposed by Openbagdes, user identity protection with id hash, ...)
+
+This choice is detailled in this file. The conversion is still very basic as a lot of elements may be lost during the process ('advanced' fiels like the badge verification option proposed by Openbagdes, user identity protection with id hash, ...). We should think about completing the conversion process or even using an other conversion method such as XSLT.
 
 
 Further remarks for konnector deployement
@@ -54,7 +55,7 @@ Create a `konnector-dev-config.json` file at the root with your test credentials
 ```javascript
 {
   "COZY_URL": "http://cozy.tools:8080",
-  "fields": {"login":"zuck.m@rk.fb", "password":"123456"}
+  "fields": {}
 }
 ```
 Then :
